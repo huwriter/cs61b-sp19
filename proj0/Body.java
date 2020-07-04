@@ -1,97 +1,89 @@
-public class Body{/**这些实例要加public*/
-	public double xxPos;
-	public double yyPos;
-	public double xxVel;
-	public double yyVel;
-	public double mass;
-	public String imgFileName;
+public class Body {
+ 
+    public double xxPos;
+    public double yyPos;
+    public double xxVel;
+    public double yyVel;
+    public double mass;
+ 
+ 
+    public String imgFileName;
+ 
+    public Body(double xP, double yP, double xV, double yV, double m, String img) {
+        xxPos = xP;
+        yyPos = yP;
+        xxVel = xV;
+        yyVel = yV;
+        mass = m;
+        imgFileName = img;
+    }
+ 
+    public Body(Body b) {
+        xxPos = b.xxPos;
+        yyPos = b.yyPos;
+        xxVel = b.xxVel;
+        yyVel = b.yyVel;
+        mass = b.mass;
+        imgFileName = b.imgFileName;
+    }
+    public double calcDistance(Body b){
+        double dx = this.xxPos - b.xxPos;
+        double dy = this.yyPos - b.yyPos;
+        double r = Math.hypot(dx, dy);
+        return r;
+    }
+ 
+    public double calcForceExertedBy(Body b){
+        double G = 6.67e-11;//
+        double r1=calcDistance(b);
+        double F=G*this.mass*b.mass/(r1*r1);
+        return F;
+    }
 
-
-	public Body(double xP, double yP, double xV,
-              double yV, double m, String img)
-	{
-		xxPos=xP;
-		yyPos=yP;
-		xxVel=xV;
-		yyVel=yV;
-		mass=m;
-		imgFileName=img;
-		/** instance is left,so right given to left*/
-	}
-
-	public Body(Body b)/**no define type*/
-	{
-		xxPos=b.xxPos;
-		yyPos=b.yyPos;
-		xxVel=b.xxVel;
-		yyVel=b.yyVel;
-		mass=b.mass;
-		imgFileName=b.imgFileName;
-	}
-	/**to avoid repeat, one use this. one use b.*/
-	public double calcDistance(Body b)
-	{
-		double dx=this.xxPos-b.xxPos;
-		double dy=this.yyPos-b.yyPos;
-		double s2=dx*dx+dy*dy;
-		double distance2=Math.sqrt(s2);
-		return distance2;
-	}
-	public double calcForceExertedBy(Body b)
-	{
-		double G=6.67e-11;
-		double r=calcDistance(b);
-		double F=G*this.mass*b.mass/(r*r);
-		return F;
-	}
-	public double calcForceExertedByX(Body b)
-	{
-		double F=calcForceExertedBy(b);
-		double r=calcDistance(b);
-		double Fx=F*(b.xxPos-this.xxPos)/r;
-		return Fx;
-	}
-	public double calcForceExertedByY(Body b)
-	{
-		double F=calcForceExertedBy(b);
-		double r=calcDistance(b);
-		double Fy=F*(b.yyPos-this.yyPos)/r;
-		return Fy;
-	}
-	/**notice this variable is arrays,so Body[]+ arr's name*/
-	public double calcNetForceExertedByX(Body[] allBodys)
-	{
-		double Fnx=0;
-		for(Body n:allBodys)/**through arrys*/
-		{
-			if(!this.equals(n))/**not give ifself force,for its type 
-			is reference type ,use .equal to test if n=this itself?*/
-				Fnx+=this.calcForceExertedByX(n);
-		}
-		return Fnx;
-	}
-	public double calcNetForceExertedByY(Body[] allBodys)
-	{
-		double Fny=0;
-		for(Body n:allBodys)
-		{
-			if(!this.equals(n))
-				Fny+=this.calcForceExertedByY(n);
-		}
-		return Fny;
-	}
-	public void update(double dt,double fX,double fY)
-	{
-		/**fX,fX is Fnx,Fny,left is calculated by formula*/
-		double ax=fX/this.mass;
-		double ay=fY/this.mass;
-		this.xxVel+=ax*dt;
-		this.yyVel+=ay*dt;
-		this.xxPos+=dt*this.xxVel;
-		this.yyPos+=dt*this.yyVel;
-	}
-	public void draw(){
-		StdDraw.picture(this.xxPos,this.yyPos,"images/"+this.imgFileName);
-	}
+public double calcForceExertedByX(Body b) {
+        double Fx = this.calcForceExertedBy(b) * (b.xxPos - this.xxPos) / this.calcDistance(b);
+        return Fx;
+    }
+ 
+    public double calcForceExertedByY(Body b) {
+        double Fy = this.calcForceExertedBy(b) * (b.yyPos - this.yyPos) / this.calcDistance(b);
+        return Fy;
+    }
+ 
+    public double calcNetForceExertedByX(Body[] bs) {
+        double FxNet = 0;
+        for (Body c : bs) {
+            if (!this.equals(c)) {
+                
+                FxNet += this.calcForceExertedByX(c);
+            }
+        }
+        return FxNet;
+    }
+ 
+    public double calcNetForceExertedByY(Body[] bs) {
+        double FyNet = 0;
+        for (Body b : bs) {
+            if (!this.equals(b)) {
+                
+                FyNet += this.calcForceExertedByY(b);
+            }
+        }
+        return FyNet;
+    }
+ 
+    public void update(double dt,double fx,double fy){
+        double Ax=fx/this.mass;
+        double Ay=fy/this.mass;
+        this.xxVel += Ax * dt;
+        this.yyVel += Ay * dt;
+        this.xxPos += this.xxVel * dt;
+        this.yyPos += this.yyVel * dt;
+    }
+ 
+ 
+    public void draw() {
+ 
+        StdDraw.picture(this.xxPos, this.yyPos, "images/" + this.imgFileName);
+    }
 }
-	
